@@ -1,6 +1,8 @@
 package com.hillstonenet.po;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @Author: Fang Jinxu
@@ -8,6 +10,8 @@ import lombok.Data;
  * @Date: 2023-11-21 17:16
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class NeInfo {
 
     private String neName;
