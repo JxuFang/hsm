@@ -4,19 +4,19 @@ import com.hillstonenet.config.DataConfig;
 import com.hillstonenet.constant.LedgerConstant;
 import com.hillstonenet.po.NeInfo;
 import com.hillstonenet.service.LedgerService;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
+import com.hillstonenet.utils.ExcelUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
  * @Date: 2023-11-21 17:24
  */
 @Service
+@Slf4j
 public class LedgerServiceImpl implements LedgerService {
 
 //    @Autowired
@@ -58,19 +59,18 @@ public class LedgerServiceImpl implements LedgerService {
 
     @Override
     public void generate() {
-        List<Map<String, Object>> dataMapList = new ArrayList<>();
-        for (NeInfo neInfo : neInfoList) {
-            Map<String, Object> dataMap = new HashMap<>();
-            List<String> fieldNameList = LedgerConstant.AdcDeviceLedgerHeader.stream().map(key -> key.substring(key.lastIndexOf("."))).collect(Collectors.toList());
-            for (String fieldName : fieldNameList) {
-                dataMap.put(fieldName, )
-            }
+        List<Map<String, Object>> dataMapList = ExcelUtil.getPaddingData(neInfoList, NeInfo.class);
+
+        List<String> fieldNameList = LedgerConstant.AdcDeviceLedgerHeader.stream().map(key -> key.substring(key.lastIndexOf(".")+1)).collect(Collectors.toList());
+        List<String> adcDeviceLedgerHeader = LedgerConstant.AdcDeviceLedgerHeader.stream()
+                .map(header -> messageSource.getMessage(header, new Object[]{}, httpServletRequest.getLocale()))
+                .collect(Collectors.toList());
+        HSSFWorkbook hwk = ExcelUtil.generateExcel(adcDeviceLedgerHeader, dataMapList, fieldNameList);
+        try (OutputStream output = new FileOutputStream("./testExcel.xls")) {
+            hwk.write(output);
+            output.flush();
+        } catch (IOException e) {
+            log.error("io error");
         }
-
-
-        HSSFWorkbook hwk = new HSSFWorkbook();
-        HSSFSheet sheet = hwk.createSheet("台账");
-        HSSFRow headerRow = sheet.createRow(0);
-
     }
 }
