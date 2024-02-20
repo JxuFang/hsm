@@ -1,9 +1,7 @@
 package com.hillstonenet.utils;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -55,4 +53,47 @@ public class ExcelUtil {
         }
         return dataMapList;
     }
+
+    /**
+     * 合并单元格并设置样式
+     * @param sheet 工作表
+     * @param startRow 起始行
+     * @param endRow 结束行
+     * @param startCol 起始列
+     * @param endCol 结束列
+     * @param style 单元格样式
+     */
+    public static void mergeRegion(HSSFSheet sheet, int startRow, int endRow, int startCol, int endCol, HSSFCellStyle style) {
+        sheet.addMergedRegion(new CellRangeAddress(startRow, endRow, startCol, endCol));
+        sheet.getRow(startRow).getCell(startCol).setCellStyle(style);
+    }
+
+    /**
+     * 合并单元格
+     * @param sheet
+     * @param startRow
+     * @param endRow
+     * @param startCol
+     * @param endCol
+     */
+    public static void mergeAndCenter(HSSFSheet sheet, int startRow, int endRow, int startCol, int endCol, HSSFCellStyle style) {
+        // 居中
+//        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);  // 水平居中
+        style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);  // 垂直居中
+        mergeRegion(sheet, startRow, endRow, startCol, endCol, style);
+    }
+
+    /**
+     * 合并单元格并居中（同列）
+     * @param sheet
+     * @param startRow
+     * @param endRow
+     * @param col
+     */
+    public static void mergeAndCenter(HSSFSheet sheet, int startRow, int endRow, int col, HSSFCellStyle style) {
+        if (endRow - startRow > 0) {
+            mergeAndCenter(sheet, startRow, endRow, col, col, style);
+        }
+    }
+
 }
